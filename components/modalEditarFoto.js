@@ -17,6 +17,9 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
 } from "react-native-reanimated";
+import EmojiPicker from "./emojiPicker";
+import { useState } from "react";
+import Sticker from "./sticker";
 
 const { width, height } = Dimensions.get("screen");
 function clamp(val, min, max) {
@@ -31,12 +34,18 @@ export default function ModalEditImage({
   imageWidth,
   imageHeight,
 }) {
+  const [modalSticker, setModalSticker] = useState(false);
+  const [selectedSticker, setSelectedSticker] = useState(null);
+
+  // Escalas para alterar tamanho da imagem
   const scale = useSharedValue(1);
   const startScale = useSharedValue(0);
 
+  // Posições para arrastar imagem
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
 
+  // Ângulos para girar a imagem
   const angle = useSharedValue(0);
   const startAngle = useSharedValue(0);
 
@@ -70,7 +79,7 @@ export default function ModalEditImage({
     });
 
   // Gesto composto com todos os gestos
-  const gestures = Gesture.Race(pinch, drag, rotation);
+  const gestures = Gesture.Simultaneous(pinch, drag, rotation);
 
   // Atualizar o style
   const boxAnimatedStyles = useAnimatedStyle(() => ({
@@ -96,11 +105,13 @@ export default function ModalEditImage({
         <GestureDetector gesture={gestures}>
           <SafeAreaView style={styles.container}>
             <View style={styles.areaImage}>
+              {selectedSticker && <Sticker stickerSource={selectedSticker} />}
               <Animated.Image
                 style={[
                   {
                     width: (imageWidth * height) / imageHeight,
                     height: height,
+                    zIndex: 1,
                   },
                   boxAnimatedStyles,
                 ]}
@@ -113,19 +124,25 @@ export default function ModalEditImage({
 
       {/* BOTÕES */}
       <View style={styles.buttonContainerModal}>
-        {/* BOTÃO DE ADICIONAR STICKER */}
+        {/* BOTÃO DE FECHAR MODAL DE EDITAR FOTO */}
         <TouchableOpacity style={styles.buttonModal} onPress={onClose}>
           <FontAwesome size={28} name="close" color={"white"} />
         </TouchableOpacity>
 
         <View style={styles.buttonContainerModal2}>
-          {/* BOTÃO RESETAR STICKERS */}
-          <TouchableOpacity style={styles.buttonModal}>
+          {/* BOTÃO DE ADICIONAR STICKER */}
+          <TouchableOpacity
+            style={styles.buttonModal}
+            onPress={() => setModalSticker(true)}
+          >
             <FontAwesome size={28} name="sticky-note" color={"white"} />
           </TouchableOpacity>
 
           {/* BOTÃO RESETAR STICKERS */}
-          <TouchableOpacity style={styles.buttonModal}>
+          <TouchableOpacity
+            style={styles.buttonModal}
+            onPress={() => setSelectedSticker(null)}
+          >
             <FontAwesome size={28} name="rotate-right" color={"white"} />
           </TouchableOpacity>
 
@@ -135,6 +152,13 @@ export default function ModalEditImage({
           </TouchableOpacity>
         </View>
       </View>
+
+      {/* MODAL DOS STICKERS */}
+      <EmojiPicker
+        isVisible={modalSticker}
+        onClose={() => setModalSticker(false)}
+        onSelect={setSelectedSticker}
+      />
     </Modal>
   );
 }
@@ -155,6 +179,9 @@ const styles = StyleSheet.create({
     height: "100%",
     backgroundColor: "#0C0C0C",
     borderRadius: 20,
+    position: "absolute",
+    justifyContent: "center",
+    alignItems: "center",
     overflow: "hidden",
   },
 
