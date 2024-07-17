@@ -72,9 +72,9 @@ export default function App() {
       setImageWidth(data.width);
 
       setOpen(true);
-      setImageMirror(-1);
+      setImageMirror(facing === "front" ? -1 : 1);
 
-      console.log(data.height);
+      console.log(data);
     }
   }
 

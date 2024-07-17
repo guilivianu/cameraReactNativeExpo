@@ -33,8 +33,12 @@ export default function ModalEditImage({
 }) {
   const scale = useSharedValue(1);
   const startScale = useSharedValue(0);
+
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
+
+  const angle = useSharedValue(0);
+  const startAngle = useSharedValue(0);
 
   // Alterar tamanho da Imagem (pinça)
   const pinch = Gesture.Pinch()
@@ -56,20 +60,32 @@ export default function ModalEditImage({
     translateY.value += event.changeY;
   });
 
+  // Rotacior imagem
+  const rotation = Gesture.Rotation()
+    .onStart(() => {
+      startAngle.value = angle.value;
+    })
+    .onUpdate((event) => {
+      angle.value = startAngle.value + event.rotation;
+    });
+
   // Gesto composto com todos os gestos
-  const gestures = Gesture.Race(pinch, drag);
+  const gestures = Gesture.Race(pinch, drag, rotation);
 
   // Atualizar o style
   const boxAnimatedStyles = useAnimatedStyle(() => ({
     transform: [
+      { scaleX: imageMirror },
       { scale: scale.value },
       {
-        translateX: translateX.value,
+        translateX: imageMirror == -1 ? -translateX.value : translateX.value,
       },
       {
         translateY: translateY.value,
       },
-      { scaleX: imageMirror },
+      {
+        rotate: imageMirror == -1 ? `${-angle.value}rad` : `${angle.value}rad`,
+      },
     ],
   }));
 
