@@ -16,7 +16,9 @@
     "typescript": "~5.3.3",
     "@types/react": "~18.2.79",
     "expo-camera": "~15.0.13",
-    "expo-image-picker": "~15.0.7"
+    "expo-image-picker": "~15.0.7",
+    "react-native-gesture-handler": "~2.16.1",
+    "react-native-reanimated": "~3.10.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

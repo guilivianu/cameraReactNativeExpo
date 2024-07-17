@@ -1,0 +1,174 @@
+import {
+  StyleSheet,
+  Modal,
+  View,
+  Image,
+  SafeAreaView,
+  TouchableOpacity,
+  Dimensions,
+} from "react-native";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import {
+  Gesture,
+  GestureDetector,
+  GestureHandlerRootView,
+} from "react-native-gesture-handler";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+} from "react-native-reanimated";
+
+const { width, height } = Dimensions.get("screen");
+function clamp(val, min, max) {
+  return Math.min(Math.max(val, min), max);
+}
+
+export default function ModalEditImage({
+  visible,
+  onClose,
+  uri,
+  imageMirror,
+  imageWidth,
+  imageHeight,
+}) {
+  const scale = useSharedValue(1);
+  const startScale = useSharedValue(0);
+  const translateX = useSharedValue(0);
+  const translateY = useSharedValue(0);
+
+  // Alterar tamanho da Imagem (pinça)
+  const pinch = Gesture.Pinch()
+    .onStart(() => {
+      startScale.value = scale.value;
+    })
+    .onUpdate((event) => {
+      scale.value = clamp(
+        startScale.value * event.scale,
+        0.3,
+        Math.min(width / 100, height / 100)
+      );
+    })
+    .runOnJS(true);
+
+  // Alterar posição da Imagem (arrastar)
+  const drag = Gesture.Pan().onChange((event) => {
+    translateX.value += event.changeX;
+    translateY.value += event.changeY;
+  });
+
+  // Gesto composto com todos os gestos
+  const gestures = Gesture.Race(pinch, drag);
+
+  // Atualizar o style
+  const boxAnimatedStyles = useAnimatedStyle(() => ({
+    transform: [
+      { scale: scale.value },
+      {
+        translateX: translateX.value,
+      },
+      {
+        translateY: translateY.value,
+      },
+      { scaleX: imageMirror },
+    ],
+  }));
+
+  return (
+    <Modal style={styles.container} animationType="slide" visible={visible}>
+      {/* IMAGEM */}
+      <GestureHandlerRootView>
+        <GestureDetector gesture={gestures}>
+          <SafeAreaView style={styles.container}>
+            <View style={styles.areaImage}>
+              <Animated.Image
+                style={[
+                  {
+                    width: (imageWidth * height) / imageHeight,
+                    height: height,
+                  },
+                  boxAnimatedStyles,
+                ]}
+                source={{ uri: uri }}
+              />
+            </View>
+          </SafeAreaView>
+        </GestureDetector>
+      </GestureHandlerRootView>
+
+      {/* BOTÕES */}
+      <View style={styles.buttonContainerModal}>
+        {/* BOTÃO DE ADICIONAR STICKER */}
+        <TouchableOpacity style={styles.buttonModal} onPress={onClose}>
+          <FontAwesome size={28} name="close" color={"white"} />
+        </TouchableOpacity>
+
+        <View style={styles.buttonContainerModal2}>
+          {/* BOTÃO RESETAR STICKERS */}
+          <TouchableOpacity style={styles.buttonModal}>
+            <FontAwesome size={28} name="sticky-note" color={"white"} />
+          </TouchableOpacity>
+
+          {/* BOTÃO RESETAR STICKERS */}
+          <TouchableOpacity style={styles.buttonModal}>
+            <FontAwesome size={28} name="rotate-right" color={"white"} />
+          </TouchableOpacity>
+
+          {/* BOTÃO DE SALVAR FOTO */}
+          <TouchableOpacity style={styles.buttonModal}>
+            <FontAwesome size={28} name="download" color={"white"} />
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    //BODY
+    width: "100%",
+    height: "100%",
+    backgroundColor: "#0C0C0C",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  areaImage: {
+    //ÁREA DA IMAGEM
+    width: "100%",
+    height: "100%",
+    backgroundColor: "#0C0C0C",
+    borderRadius: 20,
+    overflow: "hidden",
+  },
+
+  buttonContainerModal: {
+    // CONTAINER DOS BOTÕES DO MODAL
+    position: "absolute",
+    width: "100%",
+    flexDirection: "row",
+    alignSelf: "flex-start",
+    justifyContent: "space-between",
+    gap: 8,
+
+    paddingHorizontal: 24,
+    marginVertical: 64,
+  },
+
+  buttonContainerModal2: {
+    // CONTAINER 2 DOS BOTÕES DO MODAL
+    flexDirection: "row",
+    gap: 8,
+  },
+
+  buttonModal: {
+    // BOTÕES DO MODAL
+    width: 48,
+    height: 48,
+    borderRadius: 100,
+    backgroundColor: "black",
+    opacity: 0.5,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+});

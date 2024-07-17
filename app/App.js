@@ -20,8 +20,12 @@ export default function App() {
 
   const [permission, requestPermission] = useCameraPermissions(); // Permissào câmera
   const [facing, setFacing] = useState("front"); // Lado câmera
+
+  const [image, setImage] = useState(); // Foto selecionada/tirada
   const [imageMirror, setImageMirror] = useState(Number); // Imagem espelhada
-  const [picture, setPicture] = useState(); // Foto selecionada/tirada
+  const [imageWidth, setImageWidth] = useState(Number); // Largura da foto selecionada/tirada
+  const [imageHeight, setImageHeight] = useState(Number); // Altura da foto selecionada/tirada
+
   const [open, setOpen] = useState(false); // Modal aberto/fechado
 
   // Permissão câmera
@@ -50,7 +54,10 @@ export default function App() {
     console.log(result);
 
     if (!result.canceled) {
-      setPicture(result.assets[0].uri);
+      setImage(result.assets[0].uri);
+      setImageHeight(result.assets[0].height);
+      setImageWidth(result.assets[0].width);
+
       setOpen(true);
       setImageMirror(1);
     }
@@ -60,11 +67,14 @@ export default function App() {
   async function takePhoto() {
     if (camRef) {
       const data = await camRef.current.takePictureAsync();
-      setPicture(data.uri);
+      setImage(data.uri);
+      setImageHeight(data.height);
+      setImageWidth(data.width);
+
       setOpen(true);
       setImageMirror(-1);
 
-      console.log(picture);
+      console.log(data.height);
     }
   }
 
@@ -108,14 +118,16 @@ export default function App() {
       </View>
 
       {/* MODAL */}
-      {picture && (
+      {image && (
         <ModalEditImage
-          uri={picture}
+          uri={image}
           visible={open}
           onClose={() => {
-            setPicture(null);
+            setImage(null);
           }}
           imageMirror={imageMirror}
+          imageWidth={imageWidth}
+          imageHeight={imageHeight}
         />
       )}
     </SafeAreaView>
