@@ -11,7 +11,8 @@ import { useState } from "react";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 export default function EmojiPicker({ isVisible, onClose, onSelect }) {
-  const [emoji] = useState([
+  // Lista de stickers
+  const [stickers] = useState([
     require("../assets/stickers/emoji1.png"),
     require("../assets/stickers/emoji2.png"),
     require("../assets/stickers/emoji3.png"),
@@ -38,17 +39,21 @@ export default function EmojiPicker({ isVisible, onClose, onSelect }) {
       <View style={styles.modal}>
         {/* Título */}
         <View style={styles.titleContainer}>
+          {/* Texto do título */}
           <Text style={styles.title}>Escolha um sticker</Text>
+
+          {/* Botão de fechar modal */}
           <TouchableOpacity onPress={onClose}>
             <MaterialIcons name="close" color="#fff" size={22} />
           </TouchableOpacity>
         </View>
 
-        {/* Stickers */}
+        {/* Lista de stickers */}
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={styles.stickersContainer}>
-            {emoji.map((sticker, index) => {
+            {stickers.map((sticker, index) => {
               return (
+                // Sticker
                 <TouchableOpacity
                   onPress={() => {
                     onSelect(sticker);
@@ -68,6 +73,7 @@ export default function EmojiPicker({ isVisible, onClose, onSelect }) {
 
 const styles = StyleSheet.create({
   modal: {
+    // Body
     height: "75%",
     width: "100%",
     backgroundColor: "#0C0C0C",
@@ -79,25 +85,32 @@ const styles = StyleSheet.create({
     paddingVertical: 24,
     paddingHorizontal: 32,
   },
+
   titleContainer: {
+    // Container do título
     width: "100%",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     marginBottom: 24,
   },
+
   title: {
+    // Texto do título
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
   },
+
   stickersContainer: {
+    // Container dos stickers (!= lista)
     flexDirection: "row",
     flexWrap: "wrap",
     flex: 1,
     justifyContent: "space-between",
   },
   sticker: {
+    // Sticker
     width: 90,
     height: 90,
     objectFit: "contain",

@@ -35,8 +35,8 @@ export default function Sticker({ stickerSource }) {
 
   // Alterar posição da Imagem (arrastar)
   const drag = Gesture.Pan().onChange((event) => {
-    translateX.value += event.changeX;
-    translateY.value += event.changeY;
+    translateX.value += event.changeX / scale.value;
+    translateY.value += event.changeY / scale.value;
   });
 
   // Rotacior imagem
@@ -66,14 +66,15 @@ export default function Sticker({ stickerSource }) {
       },
     ],
   }));
+
   return (
     <GestureDetector gesture={gestures}>
       <Animated.Image
         style={[
           {
             top: 350,
-            width: 100,
-            height: 100,
+            width: 125,
+            height: 125,
             objectFit: "contain",
             zIndex: 2,
             position: "absolute",

@@ -33,7 +33,9 @@ export default function App() {
     return <View />;
   }
   if (!permission.granted) {
+    // Caso a permissão ainda não tenha sido aceita...
     return (
+      // Tela para pedir permissão a o usuário
       <View>
         <Text style={{ textAlign: "center", color: "#fff" }}>
           Para utilizar a câmera, é necessário obter sua autorização antes.
@@ -45,36 +47,39 @@ export default function App() {
 
   // Pegar imagem da galeria
   const pickImage = async () => {
-    // No permissions request is necessary for launching the image library
+    // Obs: Não é nescessário nenhuma permissão para abrir a bilbioteca de fotos
+
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      quality: 1,
+      //Pega a imagem que o usuário selecionou
+      mediaTypes: ImagePicker.MediaTypeOptions.All, // Determina o tipo de imagem que será possível selecionar
+      quality: 1, // Qualidade que terá a foto selecionada (1 => 100% / mesma qualidade do original)
     });
 
-    console.log(result);
+    // console.log(result);
 
     if (!result.canceled) {
-      setImage(result.assets[0].uri);
-      setImageHeight(result.assets[0].height);
-      setImageWidth(result.assets[0].width);
+      // Caso a pessoa não tenha cancelado a seleção da imagem na hora de confirmar
+      setImage(result.assets[0].uri); // Salva a imagem selecionada
+      setImageHeight(result.assets[0].height); // Salva a altura da imagem selecionada
+      setImageWidth(result.assets[0].width); // Salva a largura da imagem selecionada
 
-      setOpen(true);
-      setImageMirror(1);
+      setOpen(true); // Abre o modal de editar a imagem
+      setImageMirror(1); // Seta que a imagem não será espelhada
     }
   };
 
   // Tirar foto
   async function takePhoto() {
     if (camRef) {
-      const data = await camRef.current.takePictureAsync();
-      setImage(data.uri);
-      setImageHeight(data.height);
-      setImageWidth(data.width);
+      const data = await camRef.current.takePictureAsync(); // Tira a foto e salva em "data"
+      setImage(data.uri); // Salva a uri na imagem tirada
+      setImageHeight(data.height); // Salva a altura na imagem tirada
+      setImageWidth(data.width); // Salva a largura na imagem tirada
 
-      setOpen(true);
-      setImageMirror(facing === "front" ? -1 : 1);
+      setOpen(true); // Abre o modal de editar a imagem
+      setImageMirror(facing === "front" ? -1 : 1); // Caso a foto tirada tenha sida na câmera frontal, espelha a imagem, se for tirada na câmera traseira não espelha a imagem
 
-      console.log(data);
+      // console.log(data);
     }
   }
 
@@ -99,14 +104,7 @@ export default function App() {
 
             {/* BOTÃO DE TIRAR FOTO */}
             <TouchableOpacity style={styles.buttonPhoto} onPress={takePhoto}>
-              <View
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  backgroundColor: "white",
-                  borderRadius: 100,
-                }}
-              />
+              <View style={styles.buttonPhotoInterior} />
             </TouchableOpacity>
 
             {/* BOTÃO DE INVERTER CAMÊRA */}
@@ -192,5 +190,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     alignSelf: "flex-end",
+  },
+
+  buttonPhotoInterior: {
+    // INTERIOR DO BOTÃO DE TIRAR FOTO
+    width: "100%",
+    height: "100%",
+    backgroundColor: "white",
+    borderRadius: 100,
   },
 });
