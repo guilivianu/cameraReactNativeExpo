@@ -22,7 +22,8 @@ export default function App() {
   const [facing, setFacing] = useState("front"); // Lado câmera
 
   const [image, setImage] = useState(); // Foto selecionada/tirada
-  const [imageMirror, setImageMirror] = useState(Number); // Imagem espelhada
+  const [imageMirror, setImageMirror] = useState(-1); // Imagem espelhada
+
   const [imageWidth, setImageWidth] = useState(Number); // Largura da foto selecionada/tirada
   const [imageHeight, setImageHeight] = useState(Number); // Altura da foto selecionada/tirada
 
@@ -54,6 +55,7 @@ export default function App() {
       mediaTypes: ImagePicker.MediaTypeOptions.All, // Determina o tipo de imagem que será possível selecionar
       quality: 1, // Qualidade que terá a foto selecionada (1 => 100% / mesma qualidade do original)
     });
+    setImageMirror(1); // Seta que a imagem não será espelhada
 
     // console.log(result);
 
@@ -64,12 +66,13 @@ export default function App() {
       setImageWidth(result.assets[0].width); // Salva a largura da imagem selecionada
 
       setOpen(true); // Abre o modal de editar a imagem
-      setImageMirror(1); // Seta que a imagem não será espelhada
     }
   };
 
   // Tirar foto
   async function takePhoto() {
+    setImageMirror(facing === "front" ? -1 : 1); // Caso a foto tirada tenha sida na câmera frontal, espelha a imagem, se for tirada na câmera traseira não espelha a imagem
+
     if (camRef) {
       const data = await camRef.current.takePictureAsync(); // Tira a foto e salva em "data"
       setImage(data.uri); // Salva a uri na imagem tirada
@@ -77,8 +80,6 @@ export default function App() {
       setImageWidth(data.width); // Salva a largura na imagem tirada
 
       setOpen(true); // Abre o modal de editar a imagem
-      setImageMirror(facing === "front" ? -1 : 1); // Caso a foto tirada tenha sida na câmera frontal, espelha a imagem, se for tirada na câmera traseira não espelha a imagem
-
       // console.log(data);
     }
   }

@@ -59,6 +59,7 @@ export default function EmojiPicker({ isVisible, onClose, onSelect }) {
                     onSelect(sticker);
                     onClose();
                   }}
+                  key={index}
                 >
                   <Image source={sticker} key={index} style={styles.sticker} />
                 </TouchableOpacity>
